@@ -1,0 +1,497 @@
+x<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Socket.io - Binding the front and back-end together with Node.js and Canvas</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+    <style>
+			.reveal .slides section .fragment {
+				opacity: .2;
+			}
+			.reveal p + p {
+				margin-top:.7em;
+			}
+			.reveal .left {
+				text-align:left;
+				padding:0 15%;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Socket.io</h1>
+					<h3>Binding the front and back-end together with Node.js and Canvas</h3>
+					<p>
+						<small>by <a href="http://www.soluml.com/">Benjamin Solum</a> / <a href="https://twitter.com/soluml">@soluml</a></small>
+					</p>
+				</section>
+        
+        <section>
+          <img src="memejs.jpg" />
+        </section>
+        
+        <section>
+					<h2>JavaScript in your JavaScript</h2>
+					<ol>
+						<li class="fragment">What is Node.js?</li>
+            <li class="fragment">What is Socket.io?</li>
+            <li class="fragment">What is the &lt;canvas&gt; element?</li>
+						<li class="fragment">Bringing it all together :D</li>
+            <li class="fragment">Resources</li>
+					</ol>
+				</section>
+
+				<section data-background="#007777">
+					<h2>What is <a href="http://nodejs.org/">Node.js</a>? (Officially)</h2>
+					<p>
+						Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.
+          </p>
+          <p>
+          	Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices.
+					</p>
+				</section>
+        
+        <section data-background="#007777">
+					<h2>What is <a href="http://nodejs.org/">Node.js</a>?</h2>
+					<ol>
+						<li class="fragment">Server-side JavaScript finally done right.</li>
+            <li class="fragment">Not strictly for web development.</li>
+            <li class="fragment">In web development, it can refer to both the server-side language and the server itself.</li>
+					</ol>
+				</section>
+        
+       <section data-background="#007777">
+					<h2>App.js - Hello World!</h2>
+          <div>
+            <pre><code class="javascript">// Load the http module to create an http server.
+var http = require('http');
+
+// Configure our HTTP server to respond with Hello World to all requests.
+var server = http.createServer(function (request, response) {
+  response.writeHead(200, {"Content-Type": "text/plain"});
+  response.end("Hello World\n");
+});
+
+// Listen on port 8000, IP defaults to 127.0.0.1
+server.listen(8000);</code></pre>
+						<iframe src="text.html" height="100" style="width:90%;background:#fff;"></iframe>
+          </div>
+				</section>
+        
+        <section data-background="#007777">
+					<h2><abbr title="Node Package Manager">NPM</abbr></h2>
+          <ol>
+            <li class="fragment">Very similar to PHP's Composer or Ruby's Gems</li>
+            <li class="fragment">
+              Use a package.json file to maintain a list of modules you need in your project.
+              <pre><code class="javascript">{
+  "name"         : "Project Name",
+  "version"      : "1.0.0",
+  "private"      : true,
+  "dependencies" : {
+      "socket.io" : "*",
+      "express"   : "*",
+  },
+  "author"       : "Benjamin Solum"
+}</code></pre>
+            </li>
+					</ol>
+				</section>
+        
+        <section data-background="#007777">
+					<h2><abbr title="Node Package Manager">NPM</abbr></h2>
+          <ol start="3">
+          	<li class="fragment">
+            	Run "npm install" in the directory you want to use as your server root.
+            	<pre><code class="dos">C:\Users\Solum\Desktop> npm install</code></pre>
+            </li>
+						<li class="fragment">All of the projects dependencies will be installed locally with the versions you specified in the package.json file.</li>
+					</ol>
+				</section>
+
+        <section data-background="#007777">
+					<h2>Express - Web App Framework</h2>
+          <ul>
+          	<li class="fragment">Provides a myriad of HTTP utility methods and the Connect middleware.</li>
+            <li class="fragment">Great for quickly putting a server together so you can get back to programming.</li>
+          </ul>
+				</section>
+        
+        <section data-background="#4d7e65">
+		  <h2>Socket.io - Realtime App Middleware</h2>
+          <p>
+          	Socket.IO aims to make realtime apps possible in every browser and mobile device, blurring the differences between the different transport mechanisms. It's care-free realtime 100% in JavaScript.
+          </p>
+		</section>
+
+		<section data-background="#4d7e65">
+		  <h2>Quick Overview - Sockets</h2>
+		  <ul>
+		  	<li class="fragment">HTTP is stateless, communication essentially goes <strong>Request -> Receive -> Return</strong></li>
+		  	<li class="fragment">Before web sockets we had "long-polling" and "forever iframes"</li>
+		  	<li class="fragment">WebSockets (standardized in 2011) "...provide a mechanism for browser-based applications that need two-way communication with servers that does not rely on opening multiple HTTP connections."</li>
+		  </ul>
+		</section>
+        
+        <section data-background="#4d7e65">
+		  <h2>Socket.io - How does it work?</h2>
+          <p class="left">Socket.io selects the most capable data transport at runtime while normalizing their APIs:</p>
+          <ul>
+          	<li>WebSocket</li>
+            <li>Adobe Flash Socket</li>
+            <li>AJAX long polling</li>
+            <li>AJAX multipart streaming</li>
+            <li>Forever Iframe</li>
+            <li>JSONP Polling</li>
+          </ul>
+		</section>
+        
+        <section data-background="#4d7e65">
+		  <h2 style="position:relative;top:-2.6em;">Socket.io - Browser Support</h2>
+          <section>
+          <h2>&nbsp;</h2>
+          <p class="label left"><strong>Desktop:</strong></p>
+          <ul>
+          	<li>Internet Explorer 5.5+</li>
+            <li>Safari 3+</li>
+            <li>Google Chrome 4+</li>
+            <li>Firefox 3+</li>
+            <li>Opera 10.61+</li>
+          </ul>
+          </section>
+          <section>
+          <h2>&nbsp;</h2>
+          <p class="label left"><strong>Mobile:</strong></p>
+          <ul>
+          	<li>iPhone Safari</li>
+            <li>iPad Safari</li>
+            <li>Android WebKit</li>
+            <li>WebOs WebKit</li>
+          </ul>
+          </section>
+		</section>
+        
+        <section data-background="#4d7e65">
+		  <h2>Socket.io - Client-Side and Server-Side</h2>
+		  <p>
+          	In order to transport your data from client to server, Socket.io exists as both Node middleware and as a client library (served automatically from your local node server).
+          </p>
+		</section>
+
+    <section data-background="#4d7e65">
+		  <h2>Socket.io - Events</h2>
+		  <p>There are three native events to Socket.io. You can also create custom events which resemble native messages.</p>
+      <p>The message and disconnect events exist inside of the connection event callback.</p>
+      <ol>
+		  	<li>Connection:<br><pre><code class="javascript">io.sockets.on('connection', function (socket) {</code></pre></li>
+        <li>Message:<br><pre><code class="javascript">socket.on('message', function (data) {</code></pre></li>
+        <li>Disconnect:<br><pre><code class="javascript">socket.on('disconnect', function () {</code></pre></li>
+		  </ol>
+		</section>
+    
+    <section data-background="#4d7e65">
+		  <h2>Socket.io - Messages</h2>
+		  <p>Messages are bits of data sent to "Sockets".  There are three primary ways to send messages to sockets.</p><br>
+      <div class="left">1. Single Socket:</div>
+      <pre><code class="javascript">socket.emit('message', data);</code></pre>
+      <div class="left">2. All Sockets:</div>
+      <pre><code class="javascript">io.sockets.emit('message', data);</code></pre>
+      <div class="left">3. A "Room":</div>
+      <pre><code class="javascript">io.sockets.in('room').emit('message', data);</code></pre>
+		</section>
+    
+    <section data-background="#4d7e65">
+		  <h2>Socket.io - Volatile Messages</h2>
+		  <p>If the message you're sending isn't important, you can send it as "volatile".</p><br>
+      <pre><code class="javascript">io.sockets.in('observers').volatile.emit('message', data);</code></pre>
+		</section>
+    
+    <section data-background="#4d7e65">
+		  <h2>Socket.io - Rooms</h2>
+		  <p>Rooms allow you to organize sockets into groups. When a socket disconnects it automatically leaves a room.</p><br>
+      <pre><code class="javascript">socket.join('players');</code></pre>
+      <pre><code class="javascript">socket.leave('players');</code></pre>
+		</section>
+    
+    <section data-background="#4d7e65">
+		  <h2><abbr title="Node Package Manager">Socket.io - NPM</abbr></h2>
+          <ol>
+            <li>
+              First, let's setup our package.json file to get the middleware we need.
+              <pre><code class="javascript">{
+  "name"         : "Project Name",
+  "version"      : "1.0.0",
+  "private"      : true,
+  "dependencies" : {
+      "socket.io" : "*",
+      "express"   : "*",
+      "ejs"       : "*"
+  },
+  "author"       : "Benjamin Solum"
+}</code></pre>
+            </li>
+		  </ol>
+		</section>
+
+		<section data-background="#4d7e65">
+		  <h2>Socket.io - Server-Side (1)</h2>
+		  <ol start="2">
+		  	<li>
+              Then, let's create our Node server and hook in Express and Socket.io
+              <pre><code class="javascript">var express = require('express'),
+    app = express(),
+    port = 3700,
+    io = require('socket.io').listen(app.listen(port));
+
+app.set('views', __dirname + '/views')
+   //Set plain HTML as our template engine, which requires EJS
+   .engine('html', require('ejs').renderFile)
+   //Ensure that the Routes below aren't overwritten by static files
+   .use(app.router)
+   //All our client-side assets will be stored in a public directory
+   .use(express.static(__dirname + '/public'))
+/*** Our Routes ***/
+   .get('/', function (req, res){
+       res.render('index.html');
+   });
+</code></pre>
+            </li>
+		  </ol>
+		</section>
+
+		<section data-background="#4d7e65">
+		  <h2>Socket.io - Server-Side (2)</h2>
+		  <ol start="3">
+		  	<li>
+              Next, let's toss in some Socket.io magic to accept and send data.
+              <pre><code class="javascript">//Connection handler, fires whenever someone connects
+io.sockets.on('connection', function (socket) {
+    //Emit a "message" to the socket who just connected.
+    socket.emit('message', { message: 'welcome to the chat' });
+    //"receive" event handler
+    socket.on('receive', function (data) {
+        io.sockets.emit('message', data);
+    });
+});</code></pre>
+            </li>
+		  </ol>
+		</section>
+
+		<section data-background="#4d7e65">
+		  <h2>Socket.io - Client-Side (1)</h2>
+		  <ol start="4">
+		  	<li>
+              Now we need a simple GUI for our visitors
+              <pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;head&gt;&lt;title&gt;Chat&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;output&gt;&lt;/output&gt;
+  &lt;div&gt;
+    &lt;label for="msg"&gt;Message:&lt;/label&gt;
+    &lt;input id="msg" maxlength="255" type="text" /&gt;
+    &lt;button&gt;Send Message&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;script src="/socket.io/socket.io.js"&gt;&lt;/script&gt;
+  &lt;script src="/js/MyChat.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </li>
+		  </ol>
+		</section>
+
+		<section data-background="#4d7e65">
+		  <h2>Socket.io - Client-Side (2)</h2>
+		  <ol start="5">
+		  	<li>
+              And the MyChat.js stuff...
+              <pre><code class="javascript">window.onload = function() {
+    var messages = [],
+        socket   = io.connect(window.location.origin),
+        display  = document.getElementsByTagName("output")[0],
+        button   = document.getElementsByTagName("button")[0],
+        content  = document.getElementById("msg");
+ 
+    socket.on('message', function (data) {
+        if(data.message) {
+            messages.push(data.message);
+            var html = '';
+            for(var i=0; i&lt;messages.length; i++) {
+                html += messages[i];
+            }
+            content.innerHTML = html;
+        } else {
+            console.log("There is a problem:", data);
+        }
+    });
+ 
+    button.onclick = function() {
+        socket.emit('receive', { message: content.value });
+    };
+}</code></pre>
+            </li>
+		  </ol>
+		</section>
+
+		<section data-background="#4d7e65">
+      <h2>Socket.io - Chat Client</h2>
+      <iframe src="http://localhost:3700/chat" height="500" style="width:90%;background:#fff;"></iframe>
+    </section>
+    
+    <section data-background="#714d7e">
+      <h2>Canvas - The Flash Killer</h2>
+      <ol>
+      	<li class="fragment">Part of HTML5 and allows for dynamic, scriptable rendering of 2D shapes and bitmap images.</li>
+      	<li class="fragment">Originally introduced by Apple in 2004 as part of webkit.</li>
+        <li class="fragment">With JavaScript, we can continually draw to and clear the canvas for animation.</li>
+        <li class="fragment">Browser Support: IE9+</li>
+      </ol>
+    </section>
+    
+    <section data-background="#714d7e">
+      <h2>Canvas - The Context</h2>
+      <p>Not to be confused with the element itself, the Canvas's context is an object with properties and methods that let you interact with the element.</p>
+      <pre><code class="javascript">//Grabbing a canvas DOM element by an id "canvas"
+var canvas = document.getElementById('canvas'),
+//Getting that canvas element's "context"
+//The context can be 2d or webgl (3d)
+ctx = canvas.getContext('2d');</code></pre>
+    </section>
+    
+    <section data-background="#714d7e">
+      <h2>Canvas - Animation</h2>
+      <p>To animate a canvas, you have to clear and re-draw the image with an interval.</p>
+      <pre><code class="javascript">//Set an interval that clears and re-draws an image
+var interval = setInterval(
+    //Clear the WHOLE canvas, then draw!
+    function(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      draw();
+    },
+    
+    //Run every 33 milliseconds
+    33
+);
+
+//Draw image with context
+function draw() {
+    ctx.beginPath();</code></pre>
+    </section>
+    
+    
+    
+    
+    <section>
+      <h1>Demo Time!</h1>
+      <a href="http://192.241.176.122:3700/" target="new"><img src="meme.jpg" /></a>
+    </section>
+
+		<section data-background="#8c4738">
+		  <h1>Resources</h1>
+          <h3>"Node.js"</h3>
+          <ul>
+          	<li><a href="http://nodejs.org/">Node.js Home Page</a></li>
+            <li><a href="http://www.nodebeginner.org/">The Node Beginner Book</a></li>
+            <li><a href="http://howtonode.org/connect-it">Connect Middleware</a></li>
+          	<li><a href="http://expressjs.com/">Express.js</a></li>
+            <li><a href="http://sailsjs.org/">Sails.js - Realtime MVC Framework</a></li>
+          </ul>
+		</section>
+        
+    <section data-background="#8c4738">
+		  <h1>Resources</h1>
+          <h3>"Socket.io"</h3>
+          <ul>
+          	<li><a href="http://socket.io/">Socket.io Home Page</a></li>
+            <li><a href="http://net.tutsplus.com/tutorials/javascript-ajax/real-time-chat-with-nodejs-socket-io-and-expressjs/">Realtime Chat with Socket.io</a></li>
+            <li><a href="http://howtonode.org/websockets-socketio">Websockets everywhere with Socket.io</a></li>
+            <li><a href="https://github.com/learnboost/socket.io/wiki">Socket.io Wiki</a></li>
+          </ul>
+		</section>
+        
+        <section data-background="#8c4738">
+					<h1>Resources</h1>
+          <h3>"Canvas"</h3>
+          <ul>
+          	<li><a href="http://www.html5canvastutorials.com/tutorials/html5-canvas-tutorials-introduction/">HTML5 Canvas Element Tutorial</a></li>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Graphics/Drawing_graphics_with_canvas">Drawing graphics with canvas</a></li>
+            <li><a href="https://developer.mozilla.org/en-US/docs/HTML/Canvas">MDN Canvas</a></li>
+            <li><a href="http://blog.nihilogic.dk/2009/02/html5-canvas-cheat-sheet.html">HTML5 Canvas Cheat Sheet</a></li>
+            <li><a href="http://caniuse.com/canvas">Can I use &lt;canvas&gt;?</a></li>
+          </ul>
+				</section>
+
+				<section>
+					<h1>THE END</h1>
+					<h3>Clap... now!</h3>
+          <ul>
+          	<li>http://upfrontwichita.com/</li>
+            <li>http://www.meetup.com/upfrontwichita/</li>
+            <li>@UpFrontICT</li>
+          </ul>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
